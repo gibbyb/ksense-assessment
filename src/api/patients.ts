@@ -65,33 +65,16 @@ const normalizePagination = (
   };
 };
 
-const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-
-const fetchPageWithRetry = async (
-  page: number,
-  limit: number,
-  attempt= 0,
-): Promise<PatientsResponse> => {
-  try {
-    return await fetchPatients(page, limit);
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 429 && attempt < 5) {
-      await delay(Math.min(1500 * 2 ** attempt, 20_000));
-      return fetchPageWithRetry(page, limit, attempt + 1);
-    }
-    throw error;
-  }
-};
-
 export const fetchAllPatients = async (): Promise<Patient[]> => {
   const all: Patient[] = [];
   let page = 1;
   while (true) {
-    const result = await fetchPageWithRetry(page, 10);
+    const result = await fetchPatients(page, 10);
     all.push(...result.data);
-    if (!result.pagination.hasNext) break
+    const { totalPages } = result.pagination;
+    if (page >= totalPages) break;
+    if (result.data.length === 0) break;
     page++;
-    await delay(500);
   }
   return all;
 };
