@@ -8,7 +8,7 @@ export const apiRetryConfig = {
   },
   retryDelay: (attemptIndex: number, error: Error) => {
     if (error instanceof ApiError && error.status === 429) {
-      return Math.min(1500 * 2 ** attemptIndex, 20_000)
+      return Math.min(1000 * 2 ** attemptIndex, 20_000)
     }
     return Math.min(1000 * 2 ** attemptIndex, 10_000)
   },
