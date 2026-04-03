@@ -1,3 +1,4 @@
+import { PAGE_SIZE } from "../lib/constants";
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 const API_KEY = import.meta.env.VITE_API_KEY as string;
 
@@ -69,11 +70,10 @@ export const fetchAllPatients = async (): Promise<Patient[]> => {
   const all: Patient[] = [];
   let page = 1;
   while (true) {
-    const result = await fetchPatients(page, 10);
-    all.push(...result.data);
-    const { totalPages } = result.pagination;
-    if (page >= totalPages) break;
+    const result = await fetchPatients(page, PAGE_SIZE);
     if (result.data.length === 0) break;
+    all.push(...result.data);
+    if (result.data.length < PAGE_SIZE) break;
     page++;
   }
   return all;
@@ -81,7 +81,7 @@ export const fetchAllPatients = async (): Promise<Patient[]> => {
 
 export const fetchPatients = async (
   page = 1,
-  limit = 10,
+  limit = PAGE_SIZE,
 ): Promise<PatientsResponse> => {
   const url = `${BASE_URL}/api/patients?page=${page}&limit=${limit}`;
   const res = await fetch(url, {

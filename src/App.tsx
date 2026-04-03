@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { AlertsPanel, PatientTable, SubmissionPanel } from './components'
 import { useAllPatients, usePatientRiskAnalysis } from './hooks';
+import {  PAGE_SIZE } from './lib/constants';
 import './App.css';
-
-const PAGE_SIZE = 10;
 
 const App = () => {
   const [page, setPage] = useState(1);
